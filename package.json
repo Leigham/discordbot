@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "standard",
-    "fix": "standard --fix"
+    "test": "eslint .eslintrc.json ./",
+    "fix": "eslint .eslintrc.json ./ --fix"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +17,7 @@
     "node-opus": "^0.3.3"
   },
   "devDependencies": {
-    "standard": "^14.3.1"
+    "standard": "^14.3.1",
+    "eslint": "^6.6.0"
   }
 }
