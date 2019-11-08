@@ -1,0 +1,5 @@
+{
+    "discord_client_secret" : "",
+    "discord_token" : "",
+    "prefix": "!" -- Temp
+}
