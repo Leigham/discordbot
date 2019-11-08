@@ -15,10 +15,5 @@ before_install:
 
 install: npm install
 
-before_script:
-  - npm install -g gulp-cli
-
-script: gulp tslint
-
 notifications:
   email: false
