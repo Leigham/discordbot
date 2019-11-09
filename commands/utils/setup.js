@@ -1,5 +1,6 @@
 const fse = require('fs-extra');
 const { MessageEmbed } = require('discord.js');
+const { updateServerData } = require('../../functions/utils.js');
 
 module.exports = {
 	name: 'setup',
@@ -41,7 +42,7 @@ module.exports = {
 					.addField('Server Name', message.guild.name)
 					.addField('Server ID', message.guild.id)
 					.addField('Member Count', message.guild.members.size)
-					.addField('Admin Role', 'admin')
+					.addField('Admin Role', 'None')
 					.setTimestamp();
 
 				tmp.delete();
@@ -54,6 +55,23 @@ module.exports = {
 				.catch(console.error);
 			return;
 		}
+		else if (args[0] == 'adminrole') {
+			if (message.mentions.roles.size === 0) {
+				message.channel.send('You need to tag a role with that command `!setup adminrole @role`')
+					.then(msg => setTimeout(() => msg.delete(), 5000))
+					.catch(console.error);
+				return;
+			}
+
+			const role = message.mentions.roles.first();
+			const adminRoles = [{
+				'name' : role.name,
+				'id' : role.id,
+			}];
+
+			updateServerData(message.guild.id, { 'adminroles' : adminRoles });
+		}
+
 		message.delete();
 	},
 };
