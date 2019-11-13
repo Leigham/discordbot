@@ -1,4 +1,8 @@
 {
+  "bin": {
+    "name": "index.js",
+    "bin": "index.js"
+  },
   "name": "discordbot",
   "version": "1.0.0",
   "description": "",
@@ -15,6 +19,13 @@
     "fs-extra": "^8.1.0",
     "libsodium-wrappers": "^0.7.6",
     "node-opus": "^0.3.3"
+  },
+  "pkg": {
+    "scripts": [
+      "commands",
+      "commands/*",
+      "commands/**/*"
+    ]
   },
   "devDependencies": {
     "standard": "^14.3.1",

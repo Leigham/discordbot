@@ -1,7 +1,19 @@
 const fs = require('fs');
 const fse = require('fs-extra');
+const { MessageEmbed } = require('discord.js');
+
+function containsObject(obj, list) {
+	for (let i = 0; i < list.length; i++) {
+		if (list[i].id == obj.id) {
+			return true;
+		}
+	}
+
+	return false;
+}
 
 module.exports = {
+
 	setupCommands: function(data, client) {
 		// -- Root Commands First.
 		for (const file of (fs.readdirSync('./commands').filter(f => f.endsWith('.js')))) {
@@ -17,9 +29,8 @@ module.exports = {
 	},
 
 	// -- Pass through the server id, and an array of index's to update.
-	updateServerData: async function(serverid, toUpdate) {
+	updateServerData: async function(serverid, toUpdate, message) {
 		console.log(`ServerID : ${serverid}, Data To Update : ${toUpdate}`);
-
 		// check if the file exists
 		const filePath = `data/${serverid}/config.json`;
 		const pathExists = await (fse.existsSync(filePath));
@@ -34,7 +45,7 @@ module.exports = {
 
 					if (typeof json[key] !== typeof toUpdate[key]) {
 						console.log(`Mismatch of data types (${typeof json[key]}/${typeof toUpdate[key]})`);
-						return;
+						return false;
 					}
 					switch (typeof json[key]) {
 					case 'string':
@@ -44,8 +55,12 @@ module.exports = {
 
 						if (Array.isArray(toUpdate[key])) {
 							toUpdate[key].forEach((element) => {
-								if (!json[key].includes(element)) {
+								if (!json[key].includes(element) && !containsObject(element, json[key])) {
 									json[key].push(element);
+								}
+								else {
+									console.log('test');
+									return false;
 								}
 							});
 						}
@@ -63,10 +78,35 @@ module.exports = {
 					}
 				}
 			}
-			fse.writeJSONSync(filePath, json, function(res, err) {
-				console.log(res);
-				console.log(err);
+			console.log('test');
+			fse.writeJSONSync(filePath, json, function(err) {
+				if (err) {
+					console.error(err);
+					return false;
+				}
 			});
+			return true;
 		}
+		else {
+			message.channel.send('There was an error');
+		}
+	},
+	fetchServerEmbed : async function(guild) {
+		const json = await fse.readJSONSync(`./data/${guild.id}/config.json`, { throws : false });
+
+		if (!json) return json;
+		const embed = new MessageEmbed()
+			.setColor(0xff00ff);
+
+
+		for (const key in json) {
+			let str = json[key].toString();
+			if (str === '') {
+				str = 'None';
+			}
+			embed.addField(key, str, true);
+		}
+		embed.setFooter('React with 🗄 to delete the message');
+		return embed;
 	},
 };
