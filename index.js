@@ -25,7 +25,6 @@ client.on('ready', () => {
 			});
 		}).catch(console.error);
 
-	ERROR
 	setupCommands(['utils', 'music'], client);
 	console.log(`Logged in as ${client.user.tag}!`);
 	client.generateInvite('ADMINISTRATOR').then(console.log).catch(console.error);
