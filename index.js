@@ -6,12 +6,28 @@ const config = require('./auth.json');
 const { setupCommands } = require('./functions/utils.js');
 client.commands = new Discord.Collection();
 const prefix = config.prefix;
-const fs = require('fs');
+const fse = require('fs-extra');
+
 
 client.on('ready', () => {
-	console.log(client.commands);
+	fse.readJSON('data/global_conf.json')
+		.then(res => {
+			client.guilds.forEach(element => {
+				const ind = res.banned_servers[element.id];
+				if (!ind) {
+					console.log('No Banned Servers');
+				}
+				else {
+					element.leave()
+						.then(console.log(`Client Left ${element.name}`))
+						.catch(console.error);
+				}
+			});
+		}).catch(console.error);
+
 	setupCommands(['utils', 'music'], client);
 	console.log(`Logged in as ${client.user.tag}!`);
+	client.generateInvite('ADMINISTRATOR').then(console.log).catch(console.error);
 });
 
 client.on('message', async message => {
@@ -21,7 +37,7 @@ client.on('message', async message => {
 	const args = message.content.slice(prefix.length).split(/ +/);
 	const command = args.shift().toLowerCase();
 
-	fs.readFile(`./data/${guildID}/config.json`, (err) => {
+	fse.readFile(`./data/servers/${guildID}/config.json`, async (err) => {
 		if (err && command !== 'setup') {
 			message.delete();
 			message.channel.send('Your server does not seem to have been setup, please run `!setup` to complete the setup')
@@ -33,7 +49,8 @@ client.on('message', async message => {
 		if (!client.commands.has(command)) return;
 
 		try {
-			client.commands.get(command).execute(message, args, client);
+			await client.commands.get(command).execute(message, args, client);
+			message.delete();
 		}
 		catch (error) {
 			console.error(error);
