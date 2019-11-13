@@ -8,5 +8,6 @@ module.exports = {
 		const global_config = await fse.readJSONSync('./data/global_conf.json');
 		console.log(global_config);
 		message.delete();
+		// Not used anymore
 	},
 };
